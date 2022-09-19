@@ -1,7 +1,7 @@
 local Remap = require("pedro.keymap")
 local lspkind = require("lspkind")
 local cmp = require("cmp")
-local tabnine = require("cmp_tabnine.config")
+local lspsaga = require("lspsaga")
 
 local nnoremap = Remap.nnoremap
 local inoremap = Remap.inoremap
@@ -9,56 +9,44 @@ local inoremap = Remap.inoremap
 local capabilities = vim.lsp.protocol.make_client_capabilities()
 capabilities.textDocument.completion.completionItem.snippetSupport = true
 
-local source_mapping = {
-	buffer = "[Buffer]",
-	nvim_lsp = "[LSP]",
-	nvim_lua = "[Lua]",
-	cmp_tabnine = "[TN]",
-	path = "[Path]",
-}
+lspsaga.init_lsp_saga({
+  server_filetype_map = {
+    typescript = "typescript"
+  },
+  diagnostic_header = { " ", " ", " ", "ﴞ " }
+})
 
 cmp.setup({
 	snippet = {
 		expand = function(args)
-			require("luasnip").lsp_expand(args.body)
+      vim.fn["vsnip#anonymous"](args.body)
 		end,
 	},
 	mapping = cmp.mapping.preset.insert({
-        ['<C-y>'] = cmp.mapping.confirm({ select = true }),
-		["<C-u>"] = cmp.mapping.scroll_docs(-4),
-		["<C-d>"] = cmp.mapping.scroll_docs(4),
+    ['<CR>'] = cmp.mapping.confirm({ select = true, behavior = cmp.ConfirmBehavior.Insert }),
+    ["<C-e>"] = cmp.mapping.close(),
+		["<C-d>"] = cmp.mapping.scroll_docs(-4),
+		["<C-f>"] = cmp.mapping.scroll_docs(4),
 		["<C-Space>"] = cmp.mapping.complete(),
 	}),
-
 	formatting = {
-		format = function(entry, vim_item)
-			vim_item.kind = lspkind.presets.default[vim_item.kind]
-			local menu = source_mapping[entry.source.name]
-			if entry.source.name == "cmp_tabnine" then
-				if entry.completion_item.data ~= nil and entry.completion_item.data.detail ~= nil then
-					menu = entry.completion_item.data.detail .. " " .. menu
-				end
-				vim_item.kind = ""
-			end
-			vim_item.menu = menu
-			return vim_item
-		end,
-	},
+    format = lspkind.cmp_format({
+      mode = 'symbol', -- show only symbol annotations
+      maxwidth = 50, -- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
 
+      -- The function below will be called before any actual modifications from lspkind
+      -- so that you can provide more controls on popup customization. (See [#30](https://github.com/onsails/lspkind-nvim/pull/30))
+      before = function (entry, vim_item)
+        return vim_item
+      end
+    })
+  },
 	sources = {
 		{ name = "nvim_lsp" },
-		{ name = "cmp_tabnine" },
-		{ name = "luasnip" },
+		{ name = "vsnip" },
+		{ name = "path" },
 		{ name = "buffer" },
 	},
-})
-
-tabnine:setup({
-	max_lines = 1000,
-	max_num_results = 20,
-	sort = true,
-	run_on_every_keystroke = true,
-	snippet_placeholder = "..",
 })
 
 local function config(_config)
@@ -83,23 +71,11 @@ require("lspconfig").tsserver.setup(config())
 
 require("lspconfig").cssls.setup(config())
 
-local snippets_paths = function()
-	local plugins = { "friendly-snippets" }
-	local paths = {}
-	local path
-	local root_path = vim.env.HOME .. "/.vim/plugged/"
-	for _, plug in ipairs(plugins) do
-		path = root_path .. plug
-		if vim.fn.isdirectory(path) ~= 0 then
-			table.insert(paths, path)
-		end
-	end
-	return paths
-end
-
-require("luasnip.loaders.from_vscode").lazy_load({
-	paths = snippets_paths(),
-	include = nil, -- Load all languages
-	exclude = {},
-})
+require("lspconfig").rust_analyzer.setup(config({
+  settings = {
+    ["rust-analyzer"] = {
+      checkOnSave = { command = "clippy" }
+    }
+  }
+}))
 

@@ -1,5 +1,5 @@
 require("pedro.set")
 require("pedro.packer")
-require("pedro.neogit")
 require("pedro.nvim-tree")
 require("pedro.lualine")
+require("pedro.git-signs")

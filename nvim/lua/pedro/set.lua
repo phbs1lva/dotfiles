@@ -1,8 +1,6 @@
 vim.opt.nu = true
 vim.opt.relativenumber = true
-
 vim.opt.errorbells = false
-
 vim.opt.tabstop = 2
 vim.opt.softtabstop = 2
 vim.opt.shiftwidth = 2
@@ -17,6 +15,7 @@ vim.opt.backup = false
 vim.opt.undofile = true
 
 vim.opt.hlsearch = false
+vim.o.incsearch = true
 
 vim.opt.termguicolors = true
 
@@ -31,11 +30,7 @@ vim.opt.cmdheight = 1
 -- delays and poor user experience.
 vim.opt.updatetime = 50
 
--- Don't pass messages to |ins-completion-menu|.
-vim.opt.shortmess:append("c")
-
 vim.opt.colorcolumn = "80"
 
 vim.g.mapleader = " "
 
-vim.o.incsearch = false

@@ -11,6 +11,9 @@ local function bind(op, outer_opts)
     end
 end
 
+vim.keymap.set("n", "<C-d>", "<C-d>zz")
+vim.keymap.set("n", "<C-u>", "<C-u>zz")
+
 M.nmap = bind("n", {noremap = false})
 M.nnoremap = bind("n")
 M.vnoremap = bind("v")
@@ -18,3 +21,4 @@ M.xnoremap = bind("x")
 M.inoremap = bind("i")
 
 return M
+

@@ -3,7 +3,7 @@ local lsp = require('lsp-zero').preset({})
 local cmp = require('cmp')
 
 lsp.on_attach(function(client, bufnr)
-  lsp.default_keymaps({buffer = bufnr})
+  lsp.default_keymaps({ buffer = bufnr })
 end)
 
 -- (Optional) Configure lua language server for neovim

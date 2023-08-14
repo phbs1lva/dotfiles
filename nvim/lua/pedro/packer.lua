@@ -38,7 +38,7 @@ return require("packer").startup(function()
     config = function() require("nvim-autopairs").setup {} end
   }
 
-  use("gruvbox-community/gruvbox")
-  use { "bluz71/vim-moonfly-colors", as = "moonfly" }
+  use { "ellisonleao/gruvbox.nvim" }
+  use('mfussenegger/nvim-dap')
 
 end)
